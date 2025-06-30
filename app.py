@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, Response
 from datetime import datetime
 from models.nlp_analysis import analyze_text
-from models.db_models import db, JournalEntry
+from models.db_models import db, JournalEntry, User
 import csv
 from functools import wraps
 
@@ -104,8 +104,12 @@ def export_csv():
 def login():
     error = None
     if request.method == 'POST':
-        if request.form['username'] == USERNAME and request.form['password'] == PASSWORD:
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username, password=password).first()
+        if user:
             session['logged_in'] = True
+            session['user_id'] = user.id
             return redirect(url_for('home'))
         else:
             error = 'Invalid username or password.'
@@ -115,6 +119,27 @@ def login():
 def logout():
     session.pop('logged_in', None)
     return redirect(url_for('login'))
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    error = None
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        if password != confirm_password:
+            error = 'Passwords do not match.'
+        elif User.query.filter_by(username=username).first():
+            error = 'Username already exists.'
+        elif User.query.filter_by(email=email).first():
+            error = 'Email already registered.'
+        else:
+            new_user = User(username=username, email=email, password=password)
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('login'))
+    return render_template('register.html', error=error)
 
 if __name__ == '__main__':
     app.run(debug=True)
