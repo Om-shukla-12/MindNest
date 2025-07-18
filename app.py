@@ -1,9 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, session, Response
 from datetime import datetime
-from models.nlp_analysis import analyze_text
+from models.nlp_analysis import analyze_text, get_suggestion
 from models.db_models import db, JournalEntry, User
 import csv
 from functools import wraps
+from deepface import DeepFace
+import os
+from flask import flash
+import base64
+from io import BytesIO
+from PIL import Image
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///journal.db'
@@ -140,6 +146,68 @@ def register():
             db.session.commit()
             return redirect(url_for('login'))
     return render_template('register.html', error=error)
+
+@app.route('/analyze_face', methods=['GET', 'POST'])
+@login_required
+def analyze_face():
+    emotion = None
+    suggestion = None
+    if request.method == 'POST':
+        # Handle webcam image (base64)
+        if 'webcam_image' in request.form and request.form['webcam_image']:
+            img_data = request.form['webcam_image']
+            header, encoded = img_data.split(',', 1)
+            img_bytes = base64.b64decode(encoded)
+            image = Image.open(BytesIO(img_bytes))
+            upload_folder = os.path.join('static', 'uploads')
+            if not os.path.exists(upload_folder):
+                os.makedirs(upload_folder)
+            filepath = os.path.join(upload_folder, 'webcam_capture.png')
+            image.save(filepath)
+            try:
+                result = DeepFace.analyze(img_path=filepath, actions=['emotion'], enforce_detection=False)
+                if isinstance(result, list):
+                    emotion = result[0].get('dominant_emotion', 'No face detected')
+                else:
+                    emotion = result.get('dominant_emotion', 'No face detected')
+                if emotion and emotion != 'No face detected':
+                    suggestion = get_suggestion(emotion)
+                    # Save to history
+                    new_entry = JournalEntry(
+                        text='Webcam Entry',
+                        sentiment='N/A',
+                        emotion=emotion,
+                        suggestion=suggestion
+                    )
+                    db.session.add(new_entry)
+                    db.session.commit()
+            except Exception as e:
+                flash(f'Error analyzing image: {e}')
+            os.remove(filepath)
+        # Handle file upload
+        elif 'face_image' in request.files:
+            file = request.files['face_image']
+            if file.filename == '':
+                flash('No selected file')
+                return redirect(request.url)
+            if file:
+                upload_folder = os.path.join('static', 'uploads')
+                if not os.path.exists(upload_folder):
+                    os.makedirs(upload_folder)
+                filepath = os.path.join(upload_folder, file.filename)
+                file.save(filepath)
+                try:
+                    result = DeepFace.analyze(img_path=filepath, actions=['emotion'], enforce_detection=False)
+                    if isinstance(result, list):
+                        emotion = result[0].get('dominant_emotion', 'No face detected')
+                    else:
+                        emotion = result.get('dominant_emotion', 'No face detected')
+                    if emotion and emotion != 'No face detected':
+                        suggestion = get_suggestion(emotion)
+                except Exception as e:
+                    flash(f'Error analyzing image: {e}')
+                os.remove(filepath)
+    return render_template('analyze_face.html', emotion=emotion, suggestion=suggestion)
 
 if __name__ == '__main__':
     app.run(debug=True)
