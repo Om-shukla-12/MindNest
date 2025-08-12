@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title>Journal History</title>
     <link rel="stylesheet" href="/static/history.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='footer.css') }}">
+    <link rel="stylesheet" href="/static/footer.css">
+    
     <style>
 @media print {
     nav, .export-btn, .pdf-btn, .actions, .top-links { display: none !important; }
@@ -25,7 +26,7 @@
 .pdf-btn:hover {
     background: #2e7031;
 }
-.footer {
+/* .footer {
     background: #2196f3;
     color: #fff;
     text-align: center;
@@ -53,6 +54,7 @@
     flex: 1 1 200px;
     min-width: 180px;
     text-align: center;
+    
 }
 .footer-right {
     flex: 1 1 200px;
@@ -67,7 +69,7 @@
 }
 .footer a:hover {
     text-decoration: underline;
-}
+} */
     </style>
 </head>
 <body>
@@ -136,7 +138,7 @@
             <a href="/about">About</a>
             <a href="/contact">Contact</a>
             <a href="/privacy">Privacy Policy</a>
-            <a href="/terms">Terms</a>
+            <!-- <a href="/terms">Terms</a> -->
         </div>
         <div class="footer-right">
             <span>Follow us:</span>
