@@ -85,3 +85,29 @@ a {
     padding: 15px;
     border-radius: 8px;
 }
+
+.suggestion-box {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #e6f7ff; /* Light blue background */
+    border-left: 5px solid #36a2eb; /* Blue border on the left */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-box h3 {
+    color: #1976d2; /* Darker blue for heading */
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.suggestion-box p {
+    color: #333; /* Dark gray for text */
+    line-height: 1.6;
+}
+
+.suggestion-box a {
+    display: inline; /* Make links inline within the paragraph */
+    margin-top: 0;
+    text-align: left;
+}

@@ -28,6 +28,7 @@
     <form id="journalForm" method="POST" action="/analyze" autocomplete="off">
         <textarea name="entry" id="entry" placeholder="Write your thoughts here..." required></textarea>
         <button type="submit">Analyze</button>
+        <button type="button" id="voiceInputBtn" class="voice-btn">🎤 Start Voice Input</button>
         <div class="warning" id="warning">Please enter something before submitting.</div>
     </form>
     <div style="text-align:center; margin-top:22px;">
@@ -66,6 +67,50 @@
             warning.style.display = 'none';
         }
     });
+
+    const voiceInputBtn = document.getElementById('voiceInputBtn');
+    let recognition;
+
+    if ('webkitSpeechRecognition' in window) {
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = function() {
+            voiceInputBtn.textContent = '🔴 Stop Voice Input';
+            voiceInputBtn.classList.add('recording');
+        };
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            entry.value += transcript + ' ';
+        };
+
+        recognition.onerror = function(event) {
+            console.error('Speech recognition error', event.error);
+            voiceInputBtn.textContent = '🎤 Start Voice Input';
+            voiceInputBtn.classList.remove('recording');
+            alert('Speech recognition error: ' + event.error + '. Please try again.');
+        };
+
+        recognition.onend = function() {
+            voiceInputBtn.textContent = '🎤 Start Voice Input';
+            voiceInputBtn.classList.remove('recording');
+        };
+
+        voiceInputBtn.addEventListener('click', function() {
+            if (voiceInputBtn.classList.contains('recording')) {
+                recognition.stop();
+            } else {
+                entry.value = ''; // Clear previous text before new input
+                recognition.start();
+            }
+        });
+    } else {
+        voiceInputBtn.style.display = 'none';
+        console.warn('Web Speech API is not supported in this browser.');
+    }
 </script>
 </body>
 </html>

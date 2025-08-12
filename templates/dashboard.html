@@ -34,6 +34,22 @@
         <b>Emotion Mapping:</b> Joy = 2, Surprise = 1, Neutral = 0, Sadness = -1, Anger = -2, Fear = -3, Disgust = -4
     </div>
     <a href="/">Back to Journal</a>
+
+    <!-- {% if latest_suggestion %}
+    <div class="suggestion-box">
+        <h3>Personalized Suggestions:</h3>
+        <p><strong>Text:</strong> {{ latest_suggestion.text_suggestion }}</p>
+        {% if latest_suggestion.exercise_suggestion %}
+        <p><strong>Exercise:</strong> {{ latest_suggestion.exercise_suggestion }}</p>
+        {% endif %}
+        {% if latest_suggestion.video_suggestion %}
+        <p><strong>Video:</strong> <a href="{{ latest_suggestion.video_suggestion }}" target="_blank">Watch Now</a></p>
+        {% endif %}
+        {% if latest_suggestion.song_suggestion %}
+        <p><strong>Song:</strong> <a href="{{ latest_suggestion.song_suggestion }}" target="_blank">Listen Now</a></p>
+        {% endif %}
+    </div>
+    {% endif %} -->
 </div>
 <script>
     const dates = {{ dates|tojson|safe }};

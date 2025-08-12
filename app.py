@@ -57,7 +57,10 @@ def dashboard():
     dates = [entry.timestamp.strftime('%Y-%m-%d') for entry in entries]
     moods = [entry.sentiment for entry in entries]
     emotions = [entry.emotion for entry in entries]
-    return render_template('dashboard.html', dates=dates, moods=moods, emotions=emotions)
+    
+    latest_suggestion = entries[-1].suggestion if entries else "No entries yet."
+
+    return render_template('dashboard.html', dates=dates, moods=moods, emotions=emotions, latest_suggestion=latest_suggestion)
 
 @app.route('/history')
 @login_required
@@ -171,7 +174,7 @@ def analyze_face():
                 else:
                     emotion = result.get('dominant_emotion', 'No face detected')
                 if emotion and emotion != 'No face detected':
-                    suggestion = get_suggestion(emotion)
+                    suggestion = get_suggestion(emotion) # Revert to old get_suggestion call
                     # Save to history
                     new_entry = JournalEntry(
                         text='Webcam Entry',
@@ -203,7 +206,7 @@ def analyze_face():
                     else:
                         emotion = result.get('dominant_emotion', 'No face detected')
                     if emotion and emotion != 'No face detected':
-                        suggestion = get_suggestion(emotion)
+                        suggestion = get_suggestion(emotion) # Revert to old get_suggestion call
                 except Exception as e:
                     flash(f'Error analyzing image: {e}')
                 os.remove(filepath)

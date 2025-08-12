@@ -1,5 +1,4 @@
-
-        body { 
+body { 
             background: #f7f7f7; 
             font-family: Arial, sans-serif; 
             margin: 0; 
@@ -101,4 +100,19 @@
             .nav-links a { margin: 4px 0; width: 100%; text-align: center; border-left: none; padding-left: 12px; }
             .logo { margin-bottom: 6px; }
         }
-    
+
+.voice-btn {
+    background-color: #28a745; /* Green for voice input */
+}
+
+.voice-btn:hover {
+    background-color: #218838;
+}
+
+.voice-btn.recording {
+    background-color: #dc3545; /* Red when recording */
+}
+
+.voice-btn.recording:hover {
+    background-color: #c82333;
+}
