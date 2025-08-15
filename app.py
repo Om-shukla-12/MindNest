@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, Response
 from datetime import datetime
-from models.nlp_analysis import analyze_text, get_suggestion
+from models.nlp_analysis import analyze_text, get_detailed_suggestion
 from models.db_models import db, JournalEntry, User
 import csv
 from functools import wraps
@@ -174,7 +174,7 @@ def analyze_face():
                 else:
                     emotion = result.get('dominant_emotion', 'No face detected')
                 if emotion and emotion != 'No face detected':
-                    suggestion = get_suggestion(emotion) # Revert to old get_suggestion call
+                    suggestion = get_detailed_suggestion('Neutral', emotion)
                     # Save to history
                     new_entry = JournalEntry(
                         text='Webcam Entry',
@@ -206,7 +206,7 @@ def analyze_face():
                     else:
                         emotion = result.get('dominant_emotion', 'No face detected')
                     if emotion and emotion != 'No face detected':
-                        suggestion = get_suggestion(emotion) # Revert to old get_suggestion call
+                        suggestion = get_detailed_suggestion('Neutral', emotion)
                 except Exception as e:
                     flash(f'Error analyzing image: {e}')
                 os.remove(filepath)

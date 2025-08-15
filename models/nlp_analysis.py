@@ -1,49 +1,51 @@
-from textblob import TextBlob # type: ignore
+
 from transformers import pipeline
 
+# Use transformer-based sentiment analysis for mood
+sentiment_classifier = pipeline("sentiment-analysis", model="cardiffnlp/twitter-roberta-base-sentiment-latest")
 emotion_classifier = pipeline("text-classification", model="j-hartmann/emotion-english-distilroberta-base", top_k=1)
 
 
 def analyze_text(text):
-    blob = TextBlob(text)
-    polarity = blob.sentiment.polarity
-
-    if polarity > 0.1:
+    # Use transformer-based sentiment analysis for mood
+    sentiment_result = sentiment_classifier(text)
+    sentiment_label = sentiment_result[0]['label'].lower()
+    if sentiment_label == 'positive':
         mood = "Positive"
-    elif polarity < -0.1:
+    elif sentiment_label == 'negative':
         mood = "Negative"
     else:
         mood = "Neutral"
 
     emotion_result = emotion_classifier(text)
-    print("DEBUG >>>", type(emotion_result), emotion_result)
-    emotion = emotion_result[0][0]['label']  # Extract the top predicted emotion
+    emotion = emotion_result[0][0]['label']
 
+    suggestion = get_detailed_suggestion(mood, emotion)
 
     return {
-        'polarity': polarity,
         'mood': mood,
         'emotion': emotion,
-        'suggestion': get_suggestion(mood)
+        'suggestion': suggestion
     }
 
-def get_suggestion(mood):
-    suggestions = {
-        "Positive": "Keep up the good vibes! Maybe share your joy with a friend.",
-        "Negative": "Take a deep breath. Consider a short walk or journaling your thoughts.",
-        "Neutral": "A quiet moment or a short meditation could help you reflect."
+def get_detailed_suggestion(mood, emotion):
+    mood_suggestions = {
+        "Positive": "Keep up the good vibes! Share your joy, and keep doing what makes you happy.",
+        "Negative": "Take a deep breath. Consider a short walk, journaling, or talking to someone you trust.",
+        "Neutral": "A quiet moment or a short meditation could help you reflect and recharge."
     }
-
-    return suggestions.get(mood, "Take care of yourself!")
-
-def get_suggestion(emotion):
-    suggestions = {
-        "joy": "Celebrate your wins! Keep doing what you love.",
-        "sadness": "Take a break and do something comforting. Maybe journal more.",
-        "anger": "Try a breathing exercise or a quick walk to release tension.",
-        "fear": "You're not alone — talk to a friend or write your thoughts down.",
-        "love": "Express it! Connect with someone or share kind words.",
-        "surprise": "Channel the surprise into curiosity. What can you learn from this?",
-        "neutral": "Reflect calmly. A clear mind is a powerful tool."
+    emotion_suggestions = {
+        "joy": "Celebrate your wins! Enjoy the moment and spread positivity.",
+        "sadness": "It's okay to feel sad. Take a break, do something comforting, or reach out to a friend.",
+        "anger": "Try a breathing exercise or a quick walk to release tension. Express your feelings constructively.",
+        "fear": "You're not alone — talk to a friend, write your thoughts down, or practice grounding techniques.",
+        "love": "Express your love! Connect with someone or share kind words.",
+        "surprise": "Channel the surprise into curiosity. What can you learn from this experience?",
+        "neutral": "Reflect calmly. A clear mind is a powerful tool.",
+        "happy": "Enjoy your happiness! Share it with others and do something fun.",
+        "sad": "Take care of yourself. Try activities that comfort you and talk to someone if needed."
     }
-    return suggestions.get(emotion.lower(), "Take care of your emotional well-being.")
+    # Combine mood and emotion advice for more detail
+    mood_advice = mood_suggestions.get(mood, "Take care of yourself!")
+    emotion_advice = emotion_suggestions.get(emotion.lower(), "Take care of your emotional well-being.")
+    return f"{mood_advice} {emotion_advice}"
