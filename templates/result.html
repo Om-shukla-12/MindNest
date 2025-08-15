@@ -35,6 +35,30 @@
         <a href="/dashboard">View Dashboard</a>
         <button onclick="window.print()">Save as PDF</button>
     </div>
+
+    <div class="video-suggestions">
+        <h3>Suggested Videos for Your Mood</h3>
+        {% if result.mood|lower == 'positive' %}
+            <div class="video-item">
+                <p>🎉 Celebrate with motivational content:</p>
+                <iframe width="350" height="200" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Motivational Video" frameborder="0" allowfullscreen></iframe>
+            </div>
+        {% elif result.mood|lower == 'neutral' %}
+            <div class="video-item">
+                <p>🧘 Peaceful meditation videos:</p>
+                <iframe width="350" height="200" src="https://www.youtube.com/embed/2OEL4P1Rz04" title="Relaxing Meditation" frameborder="0" allowfullscreen></iframe>
+            </div>
+        {% elif result.mood|lower == 'negative' %}
+            <div class="video-item">
+                <p>💪 Motivational boost for tough times:</p>
+                <iframe width="350" height="200" src="https://www.youtube.com/embed/ZXsQAXx_ao0" title="Never Give Up" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="video-item">
+                <p>🌅 Positive mindset videos:</p>
+                <iframe width="350" height="200" src="https://www.youtube.com/embed/l-gQLqv9f4o" title="Positive Thinking" frameborder="0" allowfullscreen></iframe>
+            </div>
+        {% endif %}
+    </div>
 </div>
 <script>
     // Confetti for positive mood
